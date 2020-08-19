@@ -1,0 +1,60 @@
+stages:
+  - Maven test
+  - Build and push to Docker GitLab Hub
+
+maven test:
+  image: docker:stable
+  stage: Maven test
+  only:
+    - dev
+  script:
+    - mvn test
+  tags:
+    - test3
+
+docker build and push - 1.0.0:
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_REGISTRY_PASSWORD registry.gitlab.com/devqube/crm-shared
+  image: docker:stable
+  services:
+    - docker:dind
+  stage: Build and push to Docker GitLab Hub
+  only:
+    - 1.0.0
+  script:
+    - docker info
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/devqube/crm-eureka-service .
+    - docker tag registry.gitlab.com/devqube/crm-eureka-service:latest registry.gitlab.com/devqube/crm-eureka-service:1.0.0
+    - docker push registry.gitlab.com/devqube/crm-eureka-service:1.0.0
+
+docker build and push - trial:
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_REGISTRY_PASSWORD registry.gitlab.com/devqube/crm-shared
+  image: docker:stable
+  services:
+    - docker:dind
+  stage: Build and push to Docker GitLab Hub
+  only:
+    - trial
+  script:
+    - docker info
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/devqube/crm-eureka-service .
+    - docker tag registry.gitlab.com/devqube/crm-eureka-service:latest registry.gitlab.com/devqube/crm-eureka-service:trial
+    - docker push registry.gitlab.com/devqube/crm-eureka-service:trial
+
+docker build and push - latest:
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_REGISTRY_PASSWORD registry.gitlab.com/devqube/crm-shared
+  image: docker:stable
+  services:
+    - docker:dind
+  stage: Build and push to Docker GitLab Hub
+  only:
+    - master
+  script:
+    - docker info
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/devqube/crm-eureka-service .
+    - docker push registry.gitlab.com/devqube/crm-eureka-service
