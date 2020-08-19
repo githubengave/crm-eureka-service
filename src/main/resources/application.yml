@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: crm-eureka-service
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8079/eureka
+    server:
+      wait-time-in-ms-when-sync-empty: 500
+server:
+  port: 8079
